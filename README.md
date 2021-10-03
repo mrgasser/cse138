@@ -1,2 +1,2 @@
-# cse138
-Repository for 138
+# cse150
+Repository for cse 150 Intro to computer networks
