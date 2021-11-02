@@ -23,6 +23,19 @@ class Firewall (object):
   def do_firewall (self, packet, packet_in):
     # The code in here will be executed for every packet.
     print "Example Code."
+    tcp_packet = packet.find("tcp")
+    arp_packet = packet.find("arp")
+    icmp_packet = packet.find("icmp")
+
+    if arp_packet != None:
+      self.accept(packet, packet_in)
+    elif icmp_packet != None:
+      self.accept(packet, packet_in)
+    elif tcp_packet != None:
+      self.drop(packet, packet_in)
+    else:
+      self.drop(packet, packet_in)
+
 
   def _handle_PacketIn (self, event):
     """
@@ -36,6 +49,30 @@ class Firewall (object):
 
     packet_in = event.ofp # The actual ofp_packet_in message.
     self.do_firewall(packet, packet_in)
+
+  def accept (self, packet, packet_in):
+    """
+    If packet has been identified as good we process and accept it
+    """
+    msg = of.ofp_flow_mod()
+    msg.match = of.ofp_match.from_packet(packet)
+    msg.idle_timeout = 30
+    msg.hard_timeout = 30
+    msg.buffer_id = packet_in.buffer_id
+    msg.actions.append(of.ofp_action_output(port = of.OFPP_FLOOD))
+    msg.data = packet_in
+    self.connection.send(msg)
+
+  def drop (self, packet, packet_in):
+    """
+    this funtion drops a packet if it has been marked to be droped
+    """
+    msg = of.ofp_flow_mod()
+    msg.match = of.ofp_match.from_packet(packet)
+    msg.idle_timeout = 30
+    msg.hard_timeout = 30
+    msg.buffer_id = packet_in.buffer_id
+    self.connection.send(msg)
 
 def launch ():
   """
