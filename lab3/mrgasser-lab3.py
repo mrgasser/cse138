@@ -1,45 +1,43 @@
 #!/usr/bin/python
+
 from mininet.topo import Topo
 from mininet.net import Mininet
+from mininet.util import dumpNodeConnections
+from mininet.log import setLogLevel
 from mininet.cli import CLI
-from mininet.link import TCLink
-class MyTopology(Topo):
-  """
-  A basic topology
-  """
-  def __init__(self):
-    Topo.__init__(self)
+from mininet.node import RemoteController
 
-    #create users
-    client1 = self.addHost("Client1", ip="20.1.1.10/24")
-    client2 = self.addHost("Client2", ip="20.1.1.11/24")
-    client3 = self.addHost("Client3", ip="20.1.1.12/24")
-    client4 = self.addHost("Client4", ip="20.1.1.13/24")
-    server1 = self.addHost("Server1", ip="20.1.1.1/24")
-    server2 = self.addHost("Server2", ip="20.1.1.2/24")
-    server3 = self.addHost("Server3", ip="20.1.1.3/24")
+class lab3_topo(Topo):
+  def build(self):
 
-    #create openflow switch
-    openflow_switch = self.addSwitch("of_switch")
+    of_s1 = self.addSwitch('switch1')
+    c1 = self.addHost('c1',mac='00:00:00:00:00:01',ip='20.0.1.10/24')
+    c2 = self.addHost('c2',mac='00:00:00:00:00:02',ip='20.0.1.11/24')
+    c3 = self.addHost('c3',mac='00:00:00:00:00:03',ip='20.0.1.12/24')
+    c4 = self.addHost('c4',mac='00:00:00:00:00:04',ip='20.0.1.13/24')
+    s1 = self.addHost('s1',mac='00:00:00:00:00:05',ip='20.0.1.1/24')
+    s2 = self.addHost('s2',mac='00:00:00:00:00:06',ip='20.0.1.2/24')
+    s3 = self.addHost('s3',mac='00:00:00:00:00:07',ip='20.0.1.3/24')
 
-    #create liks
-    self.addLink(client1, openflow_switch)
-    self.addLink(client2, openflow_switch)
-    self.addLink(client3, openflow_switch)
-    self.addLink(client4, openflow_switch)
-    self.addLink(server1, openflow_switch)
-    self.addLink(server2, openflow_switch)
-    self.addLink(server3, openflow_switch)
+    self.addLink(c1,of_s1)
+    self.addLink(c2,of_s1)
+    self.addLink(c3,of_s1)
+    self.addLink(c4,of_s1)
+    self.addLink(s1,of_s1)
+    self.addLink(s2,of_s1)
+    self.addLink(s3,of_s1)
+
+
+def configure():
+  topo = lab3_topo()
+  net = Mininet(topo=topo, controller=RemoteController)
+  net.start()
+  #h1, h2, h3 = net.get('h1', 'h2', 'h3')
+  
+  CLI(net)
+
+  net.stop()
 
 
 if __name__ == '__main__':
-  """
-  If this script is run as an executable (by chmod +x), this is
-  what it will do
-  """
-  topo = MyTopology() ## Creates the topology
-  net = Mininet( topo=topo, link = TCLink) ## Loads the topology
-  net.start() ## Starts Mininet
-  # Commands here will run on the simulated topology
-  CLI(net)
-  net.stop() ## Stops Mininet
+  configure()
