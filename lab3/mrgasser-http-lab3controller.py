@@ -22,7 +22,7 @@ class Firewall (object):
 
   def do_firewall (self, packet, packet_in):
     # The code in here will be executed for every packet.
-    print "doing firewall"
+    print ("doing firewall")
     tcp_packet = packet.find("tcp")
     arp_packet = packet.find("arp")
     icmp_packet = packet.find("icmp")
