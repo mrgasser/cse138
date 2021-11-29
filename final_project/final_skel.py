@@ -41,7 +41,7 @@ class final_topo(Topo):
     s2 = self.addSwitch('s2') #floor 1 Switch ID: 2
     s3 = self.addSwitch('s3') # CORE SWITCH ID: 3
     s4 = self.addSwitch('s4') # Data Center Switch ID:4
-    s5 = self.addSwithc('s5') #air-gapped floor s1 ID: 5
+    s5 = self.addSwitch('s5') #air-gapped floor s1 ID: 5
     s6 = self.addSwitch('s6') #floor 2 switch 1 ID: 6
 
     # add hosts Floor 1
