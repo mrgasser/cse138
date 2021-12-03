@@ -60,9 +60,15 @@ class Final (object):
     #check for packets
     icmp_packet = packet.find("icmp")
     ipv4_packet = packet.find("ipv4")
+    arp_packet = packet.find("arp")
+    
+    # floor all arp packets
+    if (arp_packet != None):
+      self.accept(packet, packet_in, of.OFPP_FLOOD)
 
     #if ipv4 packet need to check which switch its on
-    if(ipv4_packet != None):
+    #if(arp_packet != None):
+    if(ipv4_packet is not None):
       if(switch_id == 1):
         # Switch 1
         # Floor 1 Switch 1
@@ -75,8 +81,8 @@ class Final (object):
             # destination is labmachine, send on port 9
             self.accept(packet,packet_in, 9)
           else:
-            # otherwise send on port 11
-            self.accept(packet, packet_in, 11)
+            # otherwise send on port 10
+            self.accept(packet, packet_in, 10)
         elif(port_on_switch == 9):
           # Source is Labmachine
           if(ipv4_packet.dstip == "20.2.1.10"):
@@ -84,9 +90,9 @@ class Final (object):
             self.accept(packet, packet_in, 8)
           else:
             # otherwise send on port 11
-            self.accept(packet, packet_in, 11)
-        elif(port_on_switch == 11):
-          #souce is port 11
+            self.accept(packet, packet_in, 10)
+        elif(port_on_switch == 10):
+          #souce is port 10
           if(ipv4_packet.dstip == "20.2.1.20"):
             # destination is labmachine, send on port 9
             self.accept(packet,packet_in, 9)
@@ -166,53 +172,53 @@ class Final (object):
             else:
               #else drop the packet
               self.drop(packet, packet_in)
-          elif(port_on_switch == 1):
+          elif(port_on_switch == 10):
             # source is floor 1 switch 1
             if(ipv4_packet.dstip == "20.2.1.30" or ipv4_packet.dstip == "20.2.1.40"):
               #destination is s2 floor 1
-              self.accept(packet,packet_in, 2)
+              self.accept(packet,packet_in, 11)
             elif(ipv4_packet.dstip == "30.1.4.66"):
               #destination is webserver
-              self.accept(packet,packet_in,5)
+              self.accept(packet,packet_in,13)
             else:
               self.drop(packet,packet_in)
-          elif(port_on_switch == 2):
+          elif(port_on_switch == 11):
             # source is floor 1 switch 2
             if(ipv4_packet.dstip == "20.2.1.10" or ipv4_packet.dstip == "20.2.1.20"):
               #destination is floor 1 s 1
-              self.accept(packet,packet_in, 1)
+              self.accept(packet,packet_in, 10)
             elif(ipv4_packet.dstip == "30.1.4.66"):
               #destination is webserver
-              self.accept(packet,packet_in,5)
+              self.accept(packet,packet_in,13)
             else:
               self.drop(packet,packet_in)
-          
-          elif(port_on_switch == 3):
+        
+          elif(port_on_switch == 12):
             #source is floor 2 s 1
             if(ipv4_packet.dstip == "30.1.4.66"):
               #destination is webserver
-              self.accept(packet,packet_in,5)
+              self.accept(packet,packet_in,13)
             else:
               self.drop(packet,packet_in)
 
-          elif(port_on_switch == 5):
+          elif(port_on_switch == 13):
             #source web server
             if(ipv4_packet.dstip == "20.2.1.30" or ipv4_packet.dstip == "20.2.1.40"):
               #destination is s2 floor 1
-              self.accept(packet,packet_in, 2)
+              self.accept(packet,packet_in, 11)
             elif(ipv4_packet.dstip == "20.2.1.10" or ipv4_packet.dstip == "20.2.1.20"):
               #destination is floor 1 s 1
-              self.accept(packet,packet_in, 1)
+              self.accept(packet,packet_in, 10)
             elif(ipv4_packet.dstip == "10.2.7.10" or ipv4_packet.dstip == "10.2.7.20"):
               #destination is floor 2 s1
-              self.accept(packet,packet_in, 3)
+              self.accept(packet,packet_in, 12)
             else:
               self.drop(packet, packet_in)
-          
+        
           else:
             # drop all non allowed ICMP_PACKETS
             self.drop(packet,packet_in)
-            
+          
         elif(ipv4_packet.srcip == "108.44.83.103" or ipv4_packet.dstip == "30.1.4.66"):
           #untrusted host cannot send IP traffic to server
           self.drop(packet,packet_in)
@@ -228,9 +234,9 @@ class Final (object):
         print("S4")
         if(port_on_switch == 8):
           # source is Server, send out port 11
-          self.accept(packet, packet_in, 11)
-        elif(port_on_switch == 11):
-          # source is on port 11, send to port 8
+          self.accept(packet, packet_in, 13)
+        elif(port_on_switch == 13):
+          # source is on port 13, send to port 8
           self.accept(packet, packet_in, 8)
         else:
           self.drop(packet, packet_in)
@@ -245,16 +251,16 @@ class Final (object):
           if(ipv4_packet.dstip == "40.2.5.20"):
             # destination is sc2, send on port 9
             self.accept(packet,packet_in, 9)
-          elif(ipv4_packet.dstip == "40.2.7.30"):
+          elif(ipv4_packet.dstip == "40.2.5.30"):
             # destination is sc3, send on port 10
             self.accept(packet,packet_in, 10)
-          elif(ipv4_packet.dstip == "40.2.7.40"):
+          elif(ipv4_packet.dstip == "40.2.5.40"):
             # destination is sc4, send on port 11
             self.accept(packet,packet_in, 11)
-          elif(ipv4_packet.dstip == "40.2.7.50"):
+          elif(ipv4_packet.dstip == "40.2.5.50"):
             # destination is sc5, send on port 12
             self.accept(packet,packet_in, 12)
-          elif(ipv4_packet.dstip == "40.2.7.60"):
+          elif(ipv4_packet.dstip == "40.2.5.60"):
             # destination is sc6, send on port 13
             self.accept(packet,packet_in, 13)
           else:
@@ -266,16 +272,16 @@ class Final (object):
           if(ipv4_packet.dstip == "40.2.5.10"):
             # destination is sc1, send on port 8
             self.accept(packet,packet_in, 8)
-          elif(ipv4_packet.dstip == "40.2.7.30"):
+          elif(ipv4_packet.dstip == "40.2.5.30"):
             # destination is sc3, send on port 10
             self.accept(packet,packet_in, 10)
-          elif(ipv4_packet.dstip == "40.2.7.40"):
+          elif(ipv4_packet.dstip == "40.2.5.40"):
             # destination is sc4, send on port 11
             self.accept(packet,packet_in, 11)
-          elif(ipv4_packet.dstip == "40.2.7.50"):
+          elif(ipv4_packet.dstip == "40.2.5.50"):
             # destination is sc5, send on port 12
             self.accept(packet,packet_in, 12)
-          elif(ipv4_packet.dstip == "40.2.7.60"):
+          elif(ipv4_packet.dstip == "40.2.5.60"):
             # destination is sc6, send on port 13
             self.accept(packet,packet_in, 13)
           else:
@@ -287,16 +293,16 @@ class Final (object):
           if(ipv4_packet.dstip == "40.2.5.20"):
             # destination is sc2, send on port 9
             self.accept(packet,packet_in, 9)
-          elif(ipv4_packet.dstip == "40.2.7.10"):
+          elif(ipv4_packet.dstip == "40.2.5.10"):
             # destination is sc1, send on port 8
             self.accept(packet,packet_in, 8)
-          elif(ipv4_packet.dstip == "40.2.7.40"):
+          elif(ipv4_packet.dstip == "40.2.5.40"):
             # destination is sc4, send on port 11
             self.accept(packet,packet_in, 11)
-          elif(ipv4_packet.dstip == "40.2.7.50"):
+          elif(ipv4_packet.dstip == "40.2.5.50"):
             # destination is sc5, send on port 12
             self.accept(packet,packet_in, 12)
-          elif(ipv4_packet.dstip == "40.2.7.60"):
+          elif(ipv4_packet.dstip == "40.2.5.60"):
             # destination is sc6, send on port 13
             self.accept(packet,packet_in, 13)
           else:
@@ -308,16 +314,16 @@ class Final (object):
           if(ipv4_packet.dstip == "40.2.5.20"):
             # destination is sc2, send on port 9
             self.accept(packet,packet_in, 9)
-          elif(ipv4_packet.dstip == "40.2.7.30"):
+          elif(ipv4_packet.dstip == "40.2.5.30"):
             # destination is sc3, send on port 10
             self.accept(packet,packet_in, 10)
-          elif(ipv4_packet.dstip == "40.2.7.10"):
+          elif(ipv4_packet.dstip == "40.2.5.10"):
             # destination is sc1, send on port 8
             self.accept(packet,packet_in, 8)
-          elif(ipv4_packet.dstip == "40.2.7.50"):
+          elif(ipv4_packet.dstip == "40.2.5.50"):
             # destination is sc5, send on port 12
             self.accept(packet,packet_in, 12)
-          elif(ipv4_packet.dstip == "40.2.7.60"):
+          elif(ipv4_packet.dstip == "40.2.5.60"):
             # destination is sc6, send on port 13
             self.accept(packet,packet_in, 13)
           else:
@@ -329,37 +335,37 @@ class Final (object):
           if(ipv4_packet.dstip == "40.2.5.20"):
             # destination is sc2, send on port 9
             self.accept(packet,packet_in, 9)
-          elif(ipv4_packet.dstip == "40.2.7.30"):
+          elif(ipv4_packet.dstip == "40.2.5.30"):
             # destination is sc3, send on port 10
             self.accept(packet,packet_in, 10)
-          elif(ipv4_packet.dstip == "40.2.7.40"):
+          elif(ipv4_packet.dstip == "40.2.5.40"):
             # destination is sc4, send on port 11
             self.accept(packet,packet_in, 11)
-          elif(ipv4_packet.dstip == "40.2.7.10"):
+          elif(ipv4_packet.dstip == "40.2.5.10"):
             # destination is sc1, send on port 8
             self.accept(packet,packet_in, 8)
-          elif(ipv4_packet.dstip == "40.2.7.60"):
+          elif(ipv4_packet.dstip == "40.2.5.60"):
             # destination is sc6, send on port 13
             self.accept(packet,packet_in, 13)
           else:
             #else drop the packet
             self.drop(packet, packet_in)
-        
+      
         elif(port_on_switch == 13):
           # source is sc6
           if(ipv4_packet.dstip == "40.2.5.20"):
             # destination is sc2, send on port 9
             self.accept(packet,packet_in, 9)
-          elif(ipv4_packet.dstip == "40.2.7.30"):
+          elif(ipv4_packet.dstip == "40.2.5.30"):
             # destination is sc3, send on port 10
             self.accept(packet,packet_in, 10)
-          elif(ipv4_packet.dstip == "40.2.7.40"):
+          elif(ipv4_packet.dstip == "40.2.5.40"):
             # destination is sc4, send on port 11
             self.accept(packet,packet_in, 11)
-          elif(ipv4_packet.dstip == "40.2.7.50"):
+          elif(ipv4_packet.dstip == "40.2.5.50"):
             # destination is sc5, send on port 12
             self.accept(packet,packet_in, 12)
-          elif(ipv4_packet.dstip == "40.2.7.10"):
+          elif(ipv4_packet.dstip == "40.2.5.10"):
             # destination is sc6, send on port 8
             self.accept(packet,packet_in, 8)
           else:
@@ -372,7 +378,7 @@ class Final (object):
       elif(switch_id == 6): 
         #Switch 6
         # Floor 2 Switch 1
-        # Hosts: Host 1
+        # Hosts: Host 1, Host 2
         # Switch: Core Switch
         print("S6")
         if (port_on_switch == 8): 
@@ -381,17 +387,17 @@ class Final (object):
             # destination is host2, send on port 9
             self.accept(packet,packet_in, 9)
           else:
-            # otherwise send on port 11
-            self.accept(packet, packet_in, 11)
+            # otherwise send on port 12
+            self.accept(packet, packet_in, 12)
         elif(port_on_switch == 9):
           # Source is Host2
           if(ipv4_packet.dstip == "10.2.7.10"):
             # Destination is host 1, send on port 8
             self.accept(packet, packet_in, 8)
           else:
-            # otherwise send on port 11
-            self.accept(packet, packet_in, 11)
-        elif(port_on_switch == 11):
+            # otherwise send on port 12
+            self.accept(packet, packet_in, 12)
+        elif(port_on_switch == 12):
           #souce is port 11
           if(ipv4_packet.dstip == "10.2.7.20"):
             # destination is host 2, send on port 9
@@ -405,9 +411,11 @@ class Final (object):
         else:
           #else drop the packet
           self.drop(packet, packet_in)
-      else:
-        #Flood all non IP packets
-        self.accept(packet, packet_in, of.OFPP_FLOOD)
+    else:
+      #Flood all non IP packets
+      print("non IP pakcet")
+      #self.accept(packet, packet_in, of.OFPP_FLOOD)
+      self.drop
 
 
   def accept (self, packet, packet_in, out_port):
@@ -416,8 +424,8 @@ class Final (object):
     """
     msg = of.ofp_flow_mod()
     msg.match = of.ofp_match.from_packet(packet)
-    msg.idle_timeout = 50
-    msg.hard_timeout = 50
+    msg.idle_timeout = 30
+    msg.hard_timeout = 30
     msg.buffer_id = packet_in.buffer_id
     msg.actions.append(of.ofp_action_output(port = out_port))
     msg.data = packet_in
@@ -429,8 +437,8 @@ class Final (object):
     """
     msg = of.ofp_flow_mod()
     msg.match = of.ofp_match.from_packet(packet)
-    msg.idle_timeout = 50
-    msg.hard_timeout = 50
+    msg.idle_timeout = 30
+    msg.hard_timeout = 30
     msg.buffer_id = packet_in.buffer_id
     self.connection.send(msg)
 

@@ -55,10 +55,10 @@ class final_topo(Topo):
         ip='20.2.1.40/24',defaultRoute='device2-eth0')
     
     #floor 2 hosts
-    h1 = self.addHost('h1',mac='00:00:00:00:00:05',
-        ip='10.2.7.10/24',defaultRoute='h1-eth0')
-    h2 = self.addHost('h2',mac='00:00:00:00:00:06',
-        ip='10.2.7.20/24',defaultRoute='h2-eth0')
+    host1 = self.addHost('host1',mac='00:00:00:00:00:05',
+        ip='10.2.7.10/24',defaultRoute='host1-eth0')
+    host2 = self.addHost('host2',mac='00:00:00:00:00:06',
+        ip='10.2.7.20/24',defaultRoute='host2-eth0')
     
     #other hosts
     h_trust = self.addHost('h_trust',mac='00:00:00:00:00:07',
@@ -91,8 +91,8 @@ class final_topo(Topo):
     self.addLink(s2, device2, port1=9, port2=0) #F2S2 -- Device2
 
     #floor 2 links, Department B 
-    self.addLink(s6, h1, port1=8, port2=0) #F2S1 -- Host1
-    self.addLink(s6, h2, port1=9, port2=0) #F2S1 -- Host2
+    self.addLink(s6, host1, port1=8, port2=0) #F2S1 -- Host1
+    self.addLink(s6, host2, port1=9, port2=0) #F2S1 -- Host2
 
     #air-gapped floor links
     self.addLink(s5, sc1, port1=8, port2=0) # Air Gapped -- sc1
@@ -108,11 +108,11 @@ class final_topo(Topo):
     #core switch links
     self.addLink(s3, h_trust, port1=8, port2=0) #Core Switch -- Trusted Host
     self.addLink(s3, h_untrust, port1=9, port2=0) #Core Swtich -- untrusted Host
-    self.addLink(s3, s1, port1=11, port2=1) #Core Switch -- F1S1
-    self.addLink(s3, s2, port1=11, port2=2) #Core Switch -- F1S2
-    self.addLink(s3, s6, port1=11, port2=3) #Core Switch -- F2S1
-    self.addLink(s3, s5, port1=15, port2=4) #Core Swtich -- air gapped floor
-    self.addLink(s3, s4, port1=11, port2=5) #Core Swithc -- Data center switch
+    self.addLink(s3, s1, port1=10, port2=0) #Core Switch -- F1S1
+    self.addLink(s3, s2, port1=11, port2=0) #Core Switch -- F1S2
+    self.addLink(s3, s6, port1=12, port2=0) #Core Switch -- F2S1
+    self.addLink(s3, s4, port1=13, port2=0) #Core Swithc -- Data center switch
+    self.addLink(s3, s5, port1=14, port2=0) #Core Swtich -- air gapped floor
 
 
 def configure():
